@@ -1,5 +1,7 @@
 ﻿open TreeDesigner
+open TreeDesignerChecks
 open TreeRenderer
+open TreeRendererChecks
 
 TreeDesignerChecks.runAll
 TreeRendererChecks.runAll
