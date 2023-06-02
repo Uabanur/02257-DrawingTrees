@@ -80,6 +80,18 @@ module TreeDesignerChecks =
         let rightCheck = Seq.zip ex2 merged |> Seq.forall (fun ((_,q), (_,m)) -> q.Equals(m))
         leftCheck && rightCheck
 
+    // Property 1
+    let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (tree:Tree<string*float>) =
+        let rec nodeDistanceCheck levelNodes minSpacing =
+            if List.length levelNodes <= 1 then true
+            else
+                let positions = List.map (fun (Node((_,p),_)) -> p) levelNodes |> List.sort
+                let validDistance = Seq.zip positions (Seq.skip 1 positions)
+                                        |> Seq.fold (fun s (v1,v2) -> s && v2-v1 >= minSpacing) true
+                let nextLevel = List.collect (fun (Node(_,children)) -> children) levelNodes
+                validDistance && nodeDistanceCheck nextLevel minSpacing
+        in nodeDistanceCheck [tree] 1.0
+
     let runAll =
         let check prop name = Check.One ({Config.Quick with Name = name}, prop)
 
@@ -87,3 +99,4 @@ module TreeDesignerChecks =
         check moveExtentMovesAllPairs <| nameof moveExtentMovesAllPairs
         check mergedExtentsHasMaxLength <| nameof mergedExtentsHasMaxLength
         check mergedExtentsCorrectPairMerge <| nameof mergedExtentsCorrectPairMerge
+        check nodesAtSameLevelShouldBeAtleastAGivenDistanceApart <| nameof nodesAtSameLevelShouldBeAtleastAGivenDistanceApart
