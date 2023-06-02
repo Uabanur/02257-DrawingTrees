@@ -21,26 +21,51 @@ let mergedExtentsCorrectPairMerge ex1 ex2 =
     let rightCheck = Seq.zip ex2 merged |> Seq.forall (fun ((_,q), (_,m)) -> q.Equals(m))
     leftCheck && rightCheck
 
+let floatTolerance = 1e-5
+
+let floatsEquals v1 v2 = 
+    abs (v2-v1) > floatTolerance
+
+let floatsHasMinDifference minDifference (v1, v2) =
+    let diff = abs (v2-v1)
+    diff + floatTolerance >= minDifference
+
+type Distance = float
+
 // Property 1
-let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (tree:Tree<string*float>) =
-    let rec nodeDistanceCheck levelNodes minSpacing =
-        if List.length levelNodes <= 1 then true
-        else
-            let positions = List.map (fun (Node((_,p),_)) -> p) levelNodes |> List.sort
-            let validDistance = Seq.zip positions (Seq.skip 1 positions)
-                                    |> Seq.fold (fun s (v1,v2) -> s && v2-v1 >= minSpacing) true
-            let nextLevel = List.collect (fun (Node(_,children)) -> children) levelNodes
-            validDistance && nodeDistanceCheck nextLevel minSpacing
-    in nodeDistanceCheck [tree] 1.0
+let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (spacing:Distance) (tree:Tree<unit>) =
+    let checkSpacing = 
+        floatsHasMinDifference spacing
+
+    let childrenWithAbsolutePositionToParent (Node((_,p),c)) = 
+        List.map (fun (Node((l', p'), c')) -> Node((l', p+p'), c')) c
+
+    let rec nodeDistanceCheck levelNodes =
+        let validDistance = 
+            List.length levelNodes <= 1  || 
+                let positions = List.map (fun (Node((_,p),_)) -> p) levelNodes |> List.sort
+                Seq.zip positions (Seq.skip 1 positions) |> Seq.forall checkSpacing
+
+        let nextLevel = List.collect childrenWithAbsolutePositionToParent levelNodes
+        validDistance && (List.isEmpty nextLevel || nodeDistanceCheck nextLevel)
+    in nodeDistanceCheck <| design spacing tree :: []
+
+let nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF spacingn tree = 
+    // todo: change float generator to positive spacings
+    let spacing = abs <| NormalFloat.op_Explicit spacingn
+    nodesAtSameLevelShouldBeAtleastAGivenDistanceApart spacing tree
+
 
 // Property 2
 // TODO: check sum = 0
 
 let runAll =
-    let check prop name = Check.One ({Config.Quick with Name = name}, prop)
+    let config = {Config.QuickThrowOnFailure with QuietOnSuccess = true}
+    let check prop = Check.One (config, prop)
 
-    check moveTreeMovesTree <| nameof moveTreeMovesTree
-    check moveExtentMovesAllPairs <| nameof moveExtentMovesAllPairs
-    check mergedExtentsHasMaxLength <| nameof mergedExtentsHasMaxLength
-    check mergedExtentsCorrectPairMerge <| nameof mergedExtentsCorrectPairMerge
-    check nodesAtSameLevelShouldBeAtleastAGivenDistanceApart <| nameof nodesAtSameLevelShouldBeAtleastAGivenDistanceApart
+    check moveTreeMovesTree
+    check moveExtentMovesAllPairs
+    check mergedExtentsHasMaxLength
+    check mergedExtentsCorrectPairMerge
+    check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
+    printfn "All checks are valid"
