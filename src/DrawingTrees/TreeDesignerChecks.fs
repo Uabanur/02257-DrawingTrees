@@ -61,6 +61,32 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF spacingn tree =
 // Property 2
 // TODO: check sum = 0
 
+
+// Property 3
+let treeHasReflectionalSymmetry (spacing:Distance) (tree:Tree<unit>) = 
+    let rec mirrorTree (Node(v,c)) = 
+        Node(v, c |> List.map mirrorTree |> List.rev)
+
+    let positionedOriginalTree = design spacing tree
+    let positionedMirroredTree = design spacing (mirrorTree tree)
+
+    let areMirrored (Node((_,pOriginal),_), Node((_,pMirrored),_)) =
+        floatsEquals pOriginal -pMirrored
+
+    let rec hasReflectionalSymmetry nodeOriginal nodeMirrored =
+        let (Node(_,originalChildren)) = nodeOriginal
+        let (Node(_,mirroredChildren)) = nodeMirrored
+        let mirroredPairs = List.zip originalChildren (List.rev mirroredChildren)
+        areMirrored (nodeOriginal, nodeMirrored) && List.forall areMirrored mirroredPairs
+
+    in hasReflectionalSymmetry positionedOriginalTree positionedMirroredTree
+
+let treeHasReflectionalSymmetryNF spacingn tree = 
+    // todo: change float generator to positive spacings
+    let spacing = abs <| NormalFloat.op_Explicit spacingn
+    treeHasReflectionalSymmetry spacing tree
+
+
 let runAll =
     let config = {Config.QuickThrowOnFailure with QuietOnSuccess = true}
     let check prop = Check.One (config, prop)
@@ -70,4 +96,5 @@ let runAll =
     check mergedExtentsHasMaxLength
     check mergedExtentsCorrectPairMerge
     check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
+    check treeHasReflectionalSymmetryNF
     printfn $"{moduleName}: All checks are valid"
