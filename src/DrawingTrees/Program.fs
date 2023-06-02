@@ -23,5 +23,5 @@ let tree =
 
 let designedTree = design tree
 designedTree |> printfn "%A"
-designedTree |> render
-let _ = System.Console.ReadKey ()
+// designedTree |> render
+// let _ = System.Console.ReadKey ()
