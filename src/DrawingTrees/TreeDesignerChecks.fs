@@ -1,4 +1,6 @@
 module TreeDesignerChecks
+type internal Marker = interface end
+let internal moduleName = string typeof<Marker>.DeclaringType
 
 open FsCheck
 open TreeDesigner
@@ -68,4 +70,4 @@ let runAll =
     check mergedExtentsHasMaxLength
     check mergedExtentsCorrectPairMerge
     check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
-    printfn "All checks are valid"
+    printfn $"{moduleName}: All checks are valid"
