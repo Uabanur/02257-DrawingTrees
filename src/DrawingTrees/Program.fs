@@ -1,7 +1,5 @@
 ﻿open TreeDesigner
-open TreeDesignerChecks
 open TreeRenderer
-open TreeRendererChecks
 
 TreeDesignerChecks.runAll
 TreeRendererChecks.runAll
@@ -24,6 +22,6 @@ let tree =
     ])
 
 let designedTree = design 2.0 tree
-designedTree |> printfn "%A"
-designedTree |> render
-let _ = System.Console.ReadKey ()
+// designedTree |> printfn "%A"
+// designedTree |> render
+// let _ = System.Console.ReadKey ()
