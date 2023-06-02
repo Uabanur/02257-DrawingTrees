@@ -3,6 +3,7 @@ module TreeRenderer
 open TreeDesigner
 open Plotly.NET
 open Plotly.NET.LayoutObjects // this namespace contains all object abstractions for layout styling
+open System.Drawing
 
 // TODO Add white background to the labels
 
@@ -20,9 +21,11 @@ let getChart tree =
         let nodeX = position + xOffset
         let nodePoint = point (nodeX, level) label
         let subTreePositions = List.map (fun (Node((_,p),_)) -> p + nodeX) subtrees
-        let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level-1)) subTreePositions
-        let nodeChart = nodePoint :: subTreeConnections |> Chart.combine
-        let subCharts = List.map (helper (level-1) nodeX) subtrees
+        let subTreeHorizontalConnections = List.map (fun p -> line (nodeX, level - 0.1) (p, level - 0.1)) subTreePositions
+        let subTreeVerticalConnections = List.map (fun p -> line (p, level - 0.1) (p, level - 1.0)) subTreePositions
+        let nodeSubTreeConnection = if List.isEmpty subtrees then [] else [line (nodeX, level) (nodeX, level - 1.0)]
+        let nodeChart = nodePoint :: nodeSubTreeConnection @ subTreeHorizontalConnections @ subTreeVerticalConnections |> Chart.combine
+        let subCharts = List.map (helper (level - 1.0) nodeX) subtrees
         nodeChart :: subCharts |> Chart.combine
     in helper 0 0.0 tree
 
