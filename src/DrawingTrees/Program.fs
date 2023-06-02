@@ -21,7 +21,7 @@ let tree =
         Node("c", []);
     ])
 
-let designedTree = design tree 1.0
+let designedTree = design 2.0 tree
 designedTree |> printfn "%A"
 designedTree |> render
 let _ = System.Console.ReadKey ()

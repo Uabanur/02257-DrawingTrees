@@ -48,7 +48,7 @@ let mean (x,y) :Position =
 let fitList es dist =
     List.map mean (List.zip (fitListLeft es dist) (fitListRight es dist))
 
-let design tree dist =
+let design dist tree =
     let rec design' (Node(label, subtrees)) =
         let (trees,extents) = List.unzip (List.map design' subtrees)
         let positions = fitList extents dist
