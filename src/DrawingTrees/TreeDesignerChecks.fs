@@ -26,7 +26,7 @@ let mergedExtentsCorrectPairMerge ex1 ex2 =
 let floatTolerance = 1e-5
 
 let floatsEquals v1 v2 = 
-    abs (v2-v1) > floatTolerance
+    abs (v2-v1) < floatTolerance
 
 let floatsHasMinDifference minDifference (v1, v2) =
     let diff = abs (v2-v1)
