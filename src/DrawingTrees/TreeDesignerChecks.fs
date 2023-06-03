@@ -62,7 +62,7 @@ let parentIsCenteredOverOffsprings (spacing: Distance) (tree: Tree<unit>) =
     let designedTree = design spacing tree
     let rec checkPositions (Node(_, children)) =
         let positions = List.map (fun (Node((_, p), _)) -> p) children
-        let sum = positions |> List.sum
+        let sum = if List.isEmpty positions then 0.0 else List.min positions + List.max positions
         floatsEquals sum 0.0 && List.forall checkPositions children
     checkPositions designedTree
 
@@ -105,5 +105,5 @@ let runAll =
     check mergedExtentsCorrectPairMerge
     check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
     check treeHasReflectionalSymmetryNF
-    // check parentIsCenteredOverOffspringsNF
+    check parentIsCenteredOverOffspringsNF
     printfn $"{moduleName}: All checks are valid."
