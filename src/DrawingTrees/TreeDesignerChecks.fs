@@ -25,7 +25,7 @@ let mergedExtentsCorrectPairMerge ex1 ex2 =
 
 let floatTolerance = 1e-5
 
-let floatsEquals v1 v2 = 
+let floatsEquals v1 v2 =
     abs (v2-v1) < floatTolerance
 
 let floatsHasMinDifference minDifference (v1, v2) =
@@ -36,15 +36,15 @@ type Distance = float
 
 // Property 1
 let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (spacing:Distance) (tree:Tree<unit>) =
-    let checkSpacing = 
+    let checkSpacing =
         floatsHasMinDifference spacing
 
-    let childrenWithAbsolutePositionToParent (Node((_,p),c)) = 
+    let childrenWithAbsolutePositionToParent (Node((_,p),c)) =
         List.map (fun (Node((l', p'), c')) -> Node((l', p+p'), c')) c
 
     let rec nodeDistanceCheck levelNodes =
-        let validDistance = 
-            List.length levelNodes <= 1  || 
+        let validDistance =
+            List.length levelNodes <= 1  ||
                 let positions = List.map (fun (Node((_,p),_)) -> p) levelNodes |> List.sort
                 Seq.zip positions (Seq.skip 1 positions) |> Seq.forall checkSpacing
 
@@ -52,19 +52,27 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (spacing:Distance) (tree:
         validDistance && (List.isEmpty nextLevel || nodeDistanceCheck nextLevel)
     in nodeDistanceCheck <| design spacing tree :: []
 
-let nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF spacingn tree = 
-    // todo: change float generator to positive spacings
+let nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF spacingn tree =
+    // TODO change float generator to positive spacings
     let spacing = abs <| NormalFloat.op_Explicit spacingn
     nodesAtSameLevelShouldBeAtleastAGivenDistanceApart spacing tree
 
-
 // Property 2
-// TODO: check sum = 0
+let parentIsCenteredOverOffsprings (spacing: Distance) (tree: Tree<unit>) =
+    let designedTree = design spacing tree
+    let rec checkPositions (Node(_, children)) =
+        let positions = List.map (fun (Node((_, p), _)) -> p) children
+        let sum = if List.isEmpty positions then 0.0 else List.min positions + List.max positions
+        floatsEquals sum 0.0 && List.forall checkPositions children
+    checkPositions designedTree
 
+let parentIsCenteredOverOffspringsNF spacing tree =
+    let spacing = abs <| NormalFloat.op_Explicit spacing
+    parentIsCenteredOverOffsprings spacing tree
 
 // Property 3
-let treeHasReflectionalSymmetry (spacing:Distance) (tree:Tree<unit>) = 
-    let rec mirrorTree (Node(v,c)) = 
+let treeHasReflectionalSymmetry (spacing:Distance) (tree:Tree<unit>) =
+    let rec mirrorTree (Node(v,c)) =
         Node(v, c |> List.map mirrorTree |> List.rev)
 
     let positionedOriginalTree = design spacing tree
@@ -81,8 +89,8 @@ let treeHasReflectionalSymmetry (spacing:Distance) (tree:Tree<unit>) =
 
     in hasReflectionalSymmetry positionedOriginalTree positionedMirroredTree
 
-let treeHasReflectionalSymmetryNF spacingn tree = 
-    // todo: change float generator to positive spacings
+let treeHasReflectionalSymmetryNF spacingn tree =
+    // TODO change float generator to positive spacings
     let spacing = abs <| NormalFloat.op_Explicit spacingn
     treeHasReflectionalSymmetry spacing tree
 
@@ -97,4 +105,5 @@ let runAll =
     check mergedExtentsCorrectPairMerge
     check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
     check treeHasReflectionalSymmetryNF
-    printfn $"{moduleName}: All checks are valid"
+    check parentIsCenteredOverOffspringsNF
+    printfn $"{moduleName}: All checks are valid."
