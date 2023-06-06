@@ -15,6 +15,5 @@
     <PackageReference Include="FsCheck" Version="2.16.5" />
     <PackageReference Include="FSharp.Configuration" Version="2.0.0" />
     <PackageReference Include="Plotly.Net" Version="4.0.0" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
   </ItemGroup>
 </Project>

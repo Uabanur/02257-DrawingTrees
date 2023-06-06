@@ -2,5 +2,5 @@ module Config
 
 open FSharp.Configuration
 
-type Settings = AppSettings<"app.config">
+type Settings = YamlConfig<"Config.yml">
 type DesignConfig = { Spacing: float; }

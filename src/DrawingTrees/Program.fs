@@ -22,7 +22,7 @@ let tree =
         Node("c", []);
     ])
 
-let config = { Spacing = Settings.Spacing }
+let config = { Spacing = Settings().Designer.Spacing }
 let designedTree = design config tree
 // designedTree |> printfn "%A"
 designedTree |> render
