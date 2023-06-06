@@ -1,5 +1,7 @@
 module TreeDesigner
 
+open Config
+
 type Position = float
 type Tree<'a> = Node of 'a * (Tree<'a> list)
 type Extent = (Position * Position) list
@@ -48,10 +50,10 @@ let mean (x,y) :Position =
 let fitList es dist =
     List.map mean (List.zip (fitListLeft es dist) (fitListRight es dist))
 
-let design dist tree =
+let design config tree =
     let rec design' (Node(label, subtrees)) =
         let (trees,extents) = List.unzip (List.map design' subtrees)
-        let positions = fitList extents dist
+        let positions = fitList extents config.Spacing
         let ptrees = List.map moveTree (List.zip trees positions)
         let pextents = List.map moveExtent (List.zip extents positions)
         let resultextent = (0.0, 0.0) :: mergeList pextents
