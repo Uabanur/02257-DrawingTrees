@@ -103,7 +103,7 @@ let runAll =
     check moveExtentMovesAllPairs
     check mergedExtentsHasMaxLength
     check mergedExtentsCorrectPairMerge
-    check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
-    check treeHasReflectionalSymmetryNF
-    check parentIsCenteredOverOffspringsNF
+    check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF // prop 1
+    check parentIsCenteredOverOffspringsNF                     // prop 2
+    check treeHasReflectionalSymmetryNF                        // prop 3
     printfn $"{moduleName}: All checks are valid."
