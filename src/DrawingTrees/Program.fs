@@ -2,7 +2,7 @@
 open TreeDesigner
 open TreeRenderer
 
-// TreeDesignerChecks.runAll
+TreeDesignerChecks.runAll
 TreeRendererChecks.runAll
 
 let tree =
@@ -22,7 +22,7 @@ let tree =
         Node("c", []);
     ])
 
-let config = { Spacing = Settings().Designer.Spacing }
+let config = getConfig ()
 let designedTree = design config tree
 // designedTree |> printfn "%A"
 designedTree |> render
