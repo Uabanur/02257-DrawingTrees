@@ -55,7 +55,7 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (config: DesignConfig) (t
 
 let nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF spacing tree =
     let spacing = abs <| NormalFloat.op_Explicit spacing
-    let config = { getConfig () with Spacing = spacing}
+    let config = { fst (getConfig ()) with Spacing = spacing}
     nodesAtSameLevelShouldBeAtleastAGivenDistanceApart config tree
 
 // Property 2
@@ -69,7 +69,7 @@ let parentIsCenteredOverOffsprings (config: DesignConfig) (tree: Tree<unit>) =
 
 let parentIsCenteredOverOffspringsNF spacing tree =
     let spacing = abs <| NormalFloat.op_Explicit spacing
-    let config = { getConfig () with Spacing = spacing}
+    let config = { fst (getConfig ()) with Spacing = spacing}
     parentIsCenteredOverOffsprings config tree
 
 // Property 3
@@ -93,7 +93,7 @@ let treeHasReflectionalSymmetry (config: DesignConfig) (tree:Tree<unit>) =
 
 let treeHasReflectionalSymmetryNF spacing tree =
     let spacing = abs <| NormalFloat.op_Explicit spacing
-    let config = { getConfig () with Spacing = spacing}
+    let config = { fst (getConfig ()) with Spacing = spacing}
     treeHasReflectionalSymmetry config tree
 
 

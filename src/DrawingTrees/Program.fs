@@ -22,8 +22,6 @@ let tree =
         Node("c", []);
     ])
 
-let config = getConfig ()
-let designedTree = design config tree
-// designedTree |> printfn "%A"
-designedTree |> render
-let _ = System.Console.ReadKey ()
+let designConfig, renderConfig = getConfig ()
+let designedTree = design designConfig tree
+designedTree |> render renderConfig
