@@ -7,8 +7,9 @@ let singleNode =
     Node("root", [])
 
 let rec binaryTree height = 
+    let height = max height 1
     match height with 
-    | 0 -> Node(0, [])
+    | 1 -> Node(1, [])
     | n -> Node(n, [binaryTree (n-1); binaryTree (n-1)]) 
 
 let parallelPaths paths height =
