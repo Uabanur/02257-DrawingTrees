@@ -8,6 +8,7 @@
     <Compile Include="TreeDesignerChecks.fs" />
     <Compile Include="TreeRenderer.fs" />
     <Compile Include="TreeRendererChecks.fs" />
+    <Compile Include="TreeExamples.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
