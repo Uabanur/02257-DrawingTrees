@@ -145,13 +145,13 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
         | node, [] -> node
         | Node (_, l), h::t -> findNodeByPath t l.[h]
     
-    let areIsomorphic (Node(_, l1)) (Node(_, l2)) =
+    let identicalDesign (Node(_, l1)) (Node(_, l2)) =
         let rec equalPositions (Node((_,p1), l1), Node((_,p2), l2)) = 
             floatsEquals p1 p2 && (List.zip l1 l2 |> List.forall equalPositions)
         List.zip l1 l2 |> List.forall equalPositions
         
     let designedIsomorphicSubTree = findNodeByPath path designedCompositeTree
-    areIsomorphic designedIsomorphicSubTree designedSubTree
+    identicalDesign designedIsomorphicSubTree designedSubTree
 
 let runAll () =
     printfn $"Running checks in {moduleName}..."
