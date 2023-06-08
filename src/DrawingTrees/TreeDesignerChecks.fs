@@ -103,12 +103,12 @@ type CustomGenerators =
         }
         
 
-let _ = Arb.register<CustomGenerators>()
 
-let runAll =
+let runAll () =
     let config = {Config.QuickThrowOnFailure with QuietOnSuccess = true}
     let check prop = Check.One (config, prop)
 
+    Arb.register<CustomGenerators>() |> ignore
     check moveTreeMovesTree
     check moveExtentMovesAllPairs
     check mergedExtentsHasMaxLength
