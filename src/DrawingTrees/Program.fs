@@ -3,8 +3,8 @@ open TreeRenderer
 open System.Diagnostics
 
 let runTests() =
-  TreeDesignerChecks.runAll
-  TreeRendererChecks.runAll
+  TreeDesignerChecks.runAll()
+  TreeRendererChecks.runAll()
 
 // let tree =
 //     Node("r", [
