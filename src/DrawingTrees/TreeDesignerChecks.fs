@@ -47,9 +47,10 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
     let maxLevelSize tree = 
         let rec maxLevelSize' level acc =
             let nextLevel = List.collect (fun (Node(_,c)) -> c) level
+            let maxLevelSizeSoFar = max acc (List.length level)
             match List.length nextLevel with
-            | 0 -> max (List.length level) acc
-            | _ -> maxLevelSize' nextLevel (max (List.length level) acc)
+            | 0 -> maxLevelSizeSoFar
+            | _ -> maxLevelSize' nextLevel maxLevelSizeSoFar
         in maxLevelSize' [tree] 1
 
     let rec nodeDistanceCheck levelNodes =
@@ -61,8 +62,7 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
         let nextLevel = List.collect childrenWithAbsolutePositionToParent levelNodes
         validDistance && (List.isEmpty nextLevel || nodeDistanceCheck nextLevel)
     
-    let maxLevelSizeOfGeneratedTree = maxLevelSize tree
-    let hasMultiNodeLevel = maxLevelSizeOfGeneratedTree > 1
+    let hasMultiNodeLevel = maxLevelSize tree > 1
     nodeDistanceCheck <| design spacing tree :: []
         |> Prop.classify (not hasMultiNodeLevel) "Trivial test"
         |> Prop.classify hasMultiNodeLevel "Contains multi node levels"
