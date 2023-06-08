@@ -44,6 +44,14 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
     let childrenWithAbsolutePositionToParent (Node((_,p),c)) =
         List.map (fun (Node((l', p'), c')) -> Node((l', p+p'), c')) c
 
+    let maxLevelSize tree = 
+        let rec maxLevelSize' level acc =
+            let nextLevel = List.collect (fun (Node(_,c)) -> c) level
+            match List.length nextLevel with
+            | 0 -> max (List.length level) acc
+            | _ -> maxLevelSize' nextLevel (max (List.length level) acc)
+        in maxLevelSize' [tree] 1
+
     let rec nodeDistanceCheck levelNodes =
         let validDistance =
             List.length levelNodes <= 1  ||
@@ -52,7 +60,12 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
 
         let nextLevel = List.collect childrenWithAbsolutePositionToParent levelNodes
         validDistance && (List.isEmpty nextLevel || nodeDistanceCheck nextLevel)
-    in nodeDistanceCheck <| design spacing tree :: []
+    
+    let maxLevelSizeOfGeneratedTree = maxLevelSize tree
+    let hasMultiNodeLevel = maxLevelSizeOfGeneratedTree > 1
+    nodeDistanceCheck <| design spacing tree :: []
+        |> Prop.classify (not hasMultiNodeLevel) "Trivial test"
+        |> Prop.classify hasMultiNodeLevel "Contains multi node levels"
 
 // Property 2
 let parentIsCenteredOverOffsprings (Dist(spacing)) (tree: Tree<unit>) =
@@ -141,16 +154,20 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
     areIsomorphic designedIsomorphicSubTree designedSubTree
 
 let runAll () =
-    let config = {Config.QuickThrowOnFailure with QuietOnSuccess = true}
-    let check prop = Check.One (config, prop)
+    printfn $"Running checks in {moduleName}..."
+
+    let check prop = Check.One ({Config.QuickThrowOnFailure with QuietOnSuccess = true}, prop)
+    let checkQuick lbl prop = Check.One ({Config.Quick with Name = lbl}, prop)
 
     Arb.register<CustomGenerators>() |> ignore
     check moveTreeMovesTree
     check moveExtentMovesAllPairs
     check mergedExtentsHasMaxLength
     check mergedExtentsCorrectPairMerge
-    check nodesAtSameLevelShouldBeAtleastAGivenDistanceApart // prop 1
-    check parentIsCenteredOverOffsprings                     // prop 2
-    check treeHasReflectionalSymmetry                        // prop 3
-    check identicalSubtreesAreRenderedIdentically
-    printfn $"{moduleName}: All checks are valid."
+    printfn "All basic checks are valid."
+
+    checkQuick "Property 1 check: " nodesAtSameLevelShouldBeAtleastAGivenDistanceApart
+    checkQuick "Property 2 check: " parentIsCenteredOverOffsprings
+    checkQuick "Property 3 check: " treeHasReflectionalSymmetry
+    checkQuick "Property 4 check: " identicalSubtreesAreRenderedIdentically
+
