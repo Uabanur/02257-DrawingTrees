@@ -1,2 +1,2 @@
 module TreeRendererChecks
-    let runAll = ()
+    let runAll () = ()
