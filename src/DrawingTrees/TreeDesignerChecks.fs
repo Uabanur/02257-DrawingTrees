@@ -94,6 +94,46 @@ let treeHasReflectionalSymmetryNF spacingn tree =
     let spacing = abs <| NormalFloat.op_Explicit spacingn
     treeHasReflectionalSymmetry spacing tree
 
+// Property 4
+let identicalSubtreesAreRenderedIdentically (spacing:Distance) (mainTree: Tree<unit>) (subTree: Tree<unit>) =
+    
+    let rec getRandomPath tree =
+        let r = System.Random()
+        match tree with
+        | Node (_, []) -> []
+        | Node (_, l) ->
+            let randomNode = r.Next l.Length
+            randomNode :: getRandomPath l.[randomNode]
+        
+    let rec insertAtPath subTree mainTree path =
+        match mainTree, path with
+        | _, [] -> subTree
+        | Node(v, l), h::t -> Node(v, l |> List.mapi (fun i c -> if h=i then insertAtPath subTree c t else c))
+    
+    let insert subTree mainTree =
+        let path = getRandomPath mainTree
+        (insertAtPath subTree mainTree path, path)
+        
+    let (compositeTree, path) = insert subTree mainTree
+    let designedCompositeTree = design spacing compositeTree
+    let designedSubTree = design spacing subTree
+    
+    let rec findNodeByPath path tree =
+        match tree, path with
+        | node, [] -> node
+        | Node (_, l), h::t -> findNodeByPath t l.[h]
+    
+    let areIsomorphic (Node(_, l1)) (Node(_, l2)) =
+        let rec equalPositions (Node((_,p1), l1), Node((_,p2), l2)) = 
+            floatsEquals p1 p2 && (List.zip l1 l2 |> List.forall equalPositions)
+        List.zip l1 l2 |> List.forall equalPositions
+        
+    let designedIsomorphicSubTree = findNodeByPath path designedCompositeTree
+    areIsomorphic designedIsomorphicSubTree designedSubTree
+
+let identicalSubtreesAreRenderedIdenticallyNF spacingn mainTree subTree =
+    let spacing = abs <| NormalFloat.op_Explicit spacingn
+    identicalSubtreesAreRenderedIdentically spacing mainTree subTree
 
 let runAll =
     let config = {Config.QuickThrowOnFailure with QuietOnSuccess = true}
@@ -106,4 +146,5 @@ let runAll =
     check nodesAtSameLevelShouldBeAtleastAGivenDistanceApartNF
     check treeHasReflectionalSymmetryNF
     check parentIsCenteredOverOffspringsNF
+    check identicalSubtreesAreRenderedIdenticallyNF
     printfn $"{moduleName}: All checks are valid."
