@@ -71,6 +71,9 @@ let combineRenderings renderings =
 
 
 let plot (xMinMax, yMinMax) (R(chart)) =
+    let background = Color.CyanLight // todo from configs
+    let dimensions = (800, 800)      // todo from configs
+
     let plainAxis minmax = LinearAxis.init(
         ShowLine = false,
         ShowGrid = false,
@@ -83,5 +86,5 @@ let plot (xMinMax, yMinMax) (R(chart)) =
     chart
       |> Chart.withXAxis (plainAxis xMinMax)
       |> Chart.withYAxis (plainAxis yMinMax)
-      |> Chart.withLayoutStyle(PlotBGColor=Color.fromKeyword ColorKeyword.GhostWhite)
+      |> Chart.withLayoutStyle(PlotBGColor=mapColor background, Width = fst dimensions, Height = snd dimensions)
       |> Chart.show
