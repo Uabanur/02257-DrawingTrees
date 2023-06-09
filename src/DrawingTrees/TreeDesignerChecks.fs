@@ -118,7 +118,6 @@ type CustomGenerators =
 
 // Property 4
 let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit>) (subTree: Tree<unit>) =
-    
     let rec getRandomPath tree =
         let r = System.Random()
         match tree with
@@ -151,7 +150,11 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
         List.zip l1 l2 |> List.forall equalPositions
         
     let designedIsomorphicSubTree = findNodeByPath path designedCompositeTree
+    
     identicalDesign designedIsomorphicSubTree designedSubTree
+        |> Prop.classify (path.Length = 0) "Trivial test"
+        |> Prop.classify (path.Length > 0) "Nested subtree comparison"
+
 
 let runAll () =
     printfn $"Running checks in {moduleName}..."
