@@ -153,7 +153,7 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
     
     identicalDesign designedIsomorphicSubTree designedSubTree
         |> Prop.classify (path.Length = 0) "Trivial test"
-        |> Prop.classify (path.Length > 0) "Main tree contains at least one child"
+        |> Prop.classify (path.Length > 0) "Nested subtree comparison"
 
 
 let runAll () =
