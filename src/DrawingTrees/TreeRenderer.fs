@@ -62,7 +62,7 @@ let getBounds (config: RenderConfig) (tree:Tree<'a*Position>) =
     in maxBounds 0 tree
 
 let render (config: RenderConfig) (tree:Tree<'a * Position>) =
-    let margin = 20.0 // percent, todo: get from config
+    let margin = config.Margin
 
     let marginScale = margin / 100.0
     let ((xmin,xmax),(ymin,ymax)) = getBounds config tree

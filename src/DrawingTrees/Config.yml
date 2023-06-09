@@ -4,3 +4,4 @@ Renderer:
   Mode: Plain # Drqwing mode (Plain / Alternative)
   VerticalSpacing: 1.0 # Vertical spacing between nodes
   MaxLinesLabel: 2 # Maximum number of lines for labels
+  Margin: 20.0 # Specifies drawing margin as a percentage of the horizontal and vertical ranges
