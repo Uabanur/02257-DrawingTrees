@@ -81,6 +81,10 @@ let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
     let rec mirrorTree (Node(v,c)) =
         Node(v, c |> List.map mirrorTree |> List.rev)
 
+    let rec treeDegree (Node(_,c)) = 
+        max (List.length c) (List.map treeDegree c |> List.fold max 0)
+
+
     let positionedOriginalTree = design spacing tree
     let positionedMirroredTree = design spacing (mirrorTree tree)
 
@@ -93,7 +97,10 @@ let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
         let mirroredPairs = List.zip originalChildren (List.rev mirroredChildren)
         areMirrored (nodeOriginal, nodeMirrored) && List.forall areMirrored mirroredPairs
 
+    let degree = treeDegree tree
     in hasReflectionalSymmetry positionedOriginalTree positionedMirroredTree
+        |> Prop.classify (degree <= 1) "Trivial"
+        |> Prop.classify (degree > 1) "Branching tree"
 
 type CustomGenerators = 
     static member float() = 
