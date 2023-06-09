@@ -31,21 +31,25 @@ let getRendering config tree =
         let nodePoint = point (nodeX, level) (parseLabel label) pointColor
         let subTreePositions = List.map (fun (Node((_,p),_)) -> p + nodeX) subtrees
         if config.Mode = Alternative then
-            let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level- 1.0) lineColor) subTreePositions
+            let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level- config.VerticalSpacing) lineColor) subTreePositions
             let nodeChart = nodePoint :: subTreeConnections |> combineRenderings
-            let subCharts = List.map (helper (level - 1.0) nodeX) subtrees
+            let subCharts = List.map (helper (level - config.VerticalSpacing) nodeX) subtrees
             nodeChart :: subCharts |> combineRenderings
         else
-            let subTreeHorizontalConnections = if List.isEmpty subtrees then [] else [line (List.min subTreePositions, level - 0.2) (List.max subTreePositions, level - 0.2) lineColor]
-            let subTreeVerticalConnections = List.map (fun p -> line (p, level - 0.2) (p, level - 1.0) lineColor) subTreePositions
-            let nodeSubTreeConnection = if List.isEmpty subtrees then [] else [line (nodeX, level) (nodeX, level - 0.2) lineColor]
+            let subTreeHorizontalConnections =
+                if List.isEmpty subtrees then []
+                else [line (List.min subTreePositions, level - config.VerticalSpacing / 5.0) (List.max subTreePositions, level - config.VerticalSpacing / 5.0) lineColor]
+            let subTreeVerticalConnections = List.map (fun p -> line (p, level - config.VerticalSpacing / 5.0) (p, level - config.VerticalSpacing) lineColor) subTreePositions
+            let nodeSubTreeConnection =
+                if List.isEmpty subtrees then []
+                 else [line (nodeX, level) (nodeX, level - config.VerticalSpacing / 5.0) lineColor]
             let nodeChart = subTreeHorizontalConnections @ nodeSubTreeConnection @ subTreeVerticalConnections @ [nodePoint] |> combineRenderings
-            let subCharts = List.map (helper (level - 1.0) nodeX) subtrees
+            let subCharts = List.map (helper (level - config.VerticalSpacing) nodeX) subtrees
             nodeChart :: subCharts |> combineRenderings
     helper 0 0.0 tree
 
-let getBounds (tree:Tree<'a*Position>) =
-    let verticalSpacing = 1.0 // todo: get from config
+let getBounds (config: RenderConfig) (tree:Tree<'a*Position>) =
+    let verticalSpacing = config.VerticalSpacing
     let rec maxBounds ypos (Node((_, p),c)) =
         let childBounds = List.map (maxBounds (ypos-verticalSpacing)) c
         let (xBounds, yBounds) = List.unzip childBounds
@@ -62,7 +66,7 @@ let render (config: RenderConfig) (tree:Tree<'a * Position>) =
     let margin = 20.0 // percent, todo: get from config
 
     let marginScale = margin / 100.0
-    let ((xmin,xmax),(ymin,ymax)) = getBounds tree
+    let ((xmin,xmax),(ymin,ymax)) = getBounds config tree
     let xRange = xmax - xmin
     let yRange = ymax - ymin
     let yMinMax = (ymin - yRange * marginScale, ymax + yRange * marginScale)

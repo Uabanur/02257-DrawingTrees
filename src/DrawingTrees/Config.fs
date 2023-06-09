@@ -3,9 +3,9 @@ module Config
 open FSharp.Configuration
 
 type Settings = YamlConfig<"Config.yml">
-type DesignConfig = { Spacing: float; }
+type DesignConfig = { HorizontalSpacing: float; }
 type RenderMode =  | Plain | Alternative
-type RenderConfig = { Mode: RenderMode; }
+type RenderConfig = { Mode: RenderMode; VerticalSpacing: float; }
 
 let getRenderMode (mode: string) =
     match mode with
@@ -14,4 +14,10 @@ let getRenderMode (mode: string) =
     | _ -> failwith "Invalid render mode"
 
 let getConfig () =
-    { Spacing = Settings().Designer.Spacing }, { Mode = getRenderMode <| Settings().Renderer.Mode }
+    {
+        HorizontalSpacing = Settings().Designer.HorizontalSpacing;
+    },
+    {
+        Mode = getRenderMode <| Settings().Renderer.Mode;
+        VerticalSpacing = Settings().Designer.VerticalSpacing
+    }

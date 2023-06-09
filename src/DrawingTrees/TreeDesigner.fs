@@ -23,7 +23,7 @@ let mergeList (es: Extent list) : Extent =
 
 let rec fit (ps: Extent) (qs: Extent) (config: DesignConfig) =
     match (ps, qs) with
-    | ((_,p)::ps, (q,_)::qs) -> max (fit ps qs config) (p - q + config.Spacing)
+    | ((_,p)::ps, (q,_)::qs) -> max (fit ps qs config) (p - q + config.HorizontalSpacing)
     | _                      -> 0.0
 
 let fitListLeft es config =

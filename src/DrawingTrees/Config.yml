@@ -1,4 +1,5 @@
 Designer:
-  Spacing: 1.0
+  HorizontalSpacing: 1.0
+  VerticalSpacing: 2.0
 Renderer:
   Mode: Plain

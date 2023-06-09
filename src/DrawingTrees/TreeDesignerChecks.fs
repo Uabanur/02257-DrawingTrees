@@ -64,13 +64,13 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
         validDistance && (List.isEmpty nextLevel || nodeDistanceCheck nextLevel)
 
     let hasMultiNodeLevel = maxLevelSize tree > 1
-    nodeDistanceCheck <| design {fst (getConfig()) with Spacing = spacing} tree :: []
+    nodeDistanceCheck <| design {fst (getConfig()) with HorizontalSpacing = spacing} tree :: []
         |> Prop.classify (not hasMultiNodeLevel) "Trivial test"
         |> Prop.classify hasMultiNodeLevel "Contains multi node levels"
 
 // Property 2
 let parentIsCenteredOverOffsprings (Dist(spacing)) (tree: Tree<unit>) =
-    let designedTree = design {fst (getConfig()) with Spacing = spacing} tree
+    let designedTree = design {fst (getConfig()) with HorizontalSpacing = spacing} tree
     let rec checkPositions (Node(_, children)) =
         let positions = List.map (fun (Node((_, p), _)) -> p) children
         let sum = if List.isEmpty positions then 0.0 else List.min positions + List.max positions
@@ -82,8 +82,8 @@ let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
     let rec mirrorTree (Node(v,c)) =
         Node(v, c |> List.map mirrorTree |> List.rev)
 
-    let positionedOriginalTree = design {fst (getConfig()) with Spacing = spacing} tree
-    let positionedMirroredTree = design {fst (getConfig()) with Spacing = spacing} (mirrorTree tree)
+    let positionedOriginalTree = design {fst (getConfig()) with HorizontalSpacing = spacing} tree
+    let positionedMirroredTree = design {fst (getConfig()) with HorizontalSpacing = spacing} (mirrorTree tree)
 
     let areMirrored (Node((_,pOriginal),_), Node((_,pMirrored),_)) =
         floatsEquals pOriginal -pMirrored
@@ -138,8 +138,8 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
         (insertAtPath subTree mainTree path, path)
 
     let (compositeTree, path) = insert subTree mainTree
-    let designedCompositeTree = design {fst (getConfig()) with Spacing = spacing} compositeTree
-    let designedSubTree = design {fst (getConfig()) with Spacing = spacing} subTree
+    let designedCompositeTree = design {fst (getConfig()) with HorizontalSpacing = spacing} compositeTree
+    let designedSubTree = design {fst (getConfig()) with HorizontalSpacing = spacing} subTree
 
     let rec findNodeByPath path tree =
         match tree, path with
