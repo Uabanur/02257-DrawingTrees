@@ -2,8 +2,9 @@ module Renderer
 
 open Plotly.NET
 open Plotly.NET.LayoutObjects // this namespace contains all object abstractions for layout styling
+open Config
 
-type Color = 
+type Color =
   | Black
   | Blue | BlueDark | BlueLight
   | Brown
@@ -22,7 +23,7 @@ type Color =
   | ARGB of int * int * int * int
 
 let mapColor (c:Color) :Plotly.NET.Color =
-    match c with 
+    match c with
     | Black -> Color.fromKeyword ColorKeyword.Black
     | Blue -> Color.fromKeyword ColorKeyword.Blue
     | BlueDark -> Color.fromKeyword ColorKeyword.DarkBlue
@@ -53,26 +54,26 @@ let mapColor (c:Color) :Plotly.NET.Color =
 type Rendering = R of GenericChart.GenericChart
 
 let point xy label color =
-    Chart.Point([xy], 
-        Text= StringF.join "<br>" label, 
-        TextPosition=StyleParam.TextPosition.TopCenter, 
-        ShowLegend = false, 
+    Chart.Point([xy],
+        Text= StringF.join "<br>" label,
+        TextPosition=StyleParam.TextPosition.TopCenter,
+        ShowLegend = false,
         MarkerColor = mapColor color
     ) |> R;
 
 let line (x1,y1) (x2,y2) color =
-    Chart.Line([x1;x2], [y1;y2], 
+    Chart.Line([x1;x2], [y1;y2],
         LineColor = mapColor color,
         ShowLegend = false
     ) |> R;
 
-let combineRenderings renderings = 
+let combineRenderings renderings =
   renderings |> Seq.map (fun (R(c)) -> c) |> Chart.combine |> R
 
 
-let plot (xMinMax, yMinMax) (R(chart)) =
+let plot config (xMinMax, yMinMax) (R(chart)) =
     let background = Color.CyanLight // todo from configs
-    let dimensions = (800, 800)      // todo from configs
+    let dimensions = (config.Width, config.Height)
 
     let plainAxis minmax = LinearAxis.init(
         ShowLine = false,

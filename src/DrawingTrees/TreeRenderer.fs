@@ -72,4 +72,4 @@ let render (config: RenderConfig) (tree:Tree<'a * Position>) =
     let xMinMax = (xmin - xRange * marginScale, xmax + xRange * marginScale)
 
     printfn $"bounds: {(xmin,xmax)} {(ymin,ymax)}. yminmax: {yMinMax}. xminmax: {xMinMax}"
-    getRendering config tree |> plot (xMinMax, yMinMax)
+    getRendering config tree |> plot config (xMinMax, yMinMax)
