@@ -7,3 +7,7 @@ Renderer:
   Margin: 20.0 # Specifies drawing margin as a percentage of the horizontal and vertical ranges
   Width: 800 # Drawing window width
   Height: 800 # Drawing window height
+  Colors:
+    Background: "CyanLight"
+    Line: "Black"
+    Node: "Black"

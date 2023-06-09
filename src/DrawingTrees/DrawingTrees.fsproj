@@ -4,6 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Color.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="StringF.fs" />
     <Compile Include="TreeDesigner.fs" />

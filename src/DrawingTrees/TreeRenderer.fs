@@ -23,8 +23,8 @@ let parseLabel config lbl =
 
 let getRendering config tree =
     let rec helper level (xOffset:Position) (Node((label, position), subtrees)) =
-        let pointColor = Color.Black // todo get from config
-        let lineColor = Color.Black // todo get from config
+        let pointColor = config.NodeColor
+        let lineColor = config.LineColor
 
         let nodeX = position + xOffset
         let nodePoint = point (nodeX, level) (parseLabel config label) pointColor

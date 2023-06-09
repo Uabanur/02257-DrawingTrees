@@ -1,25 +1,56 @@
 module Config
 
 open FSharp.Configuration
+open Color
 
 type Settings = YamlConfig<"Config.yml">
 type DesignConfig = { HorizontalSpacing: float; }
 type RenderMode =  | Plain | Alternative
-type RenderConfig =
-    {
-        Mode: RenderMode;
-        VerticalSpacing: float;
-        MaxLinesLabel: int;
-        Margin: float;
-        Width: int;
-        Height: int;
-    }
+type RenderConfig = {
+    Mode: RenderMode;
+    VerticalSpacing: float;
+    MaxLinesLabel: int;
+    Margin: float;
+    Width: int;
+    Height: int;
+    BackgroundColor: Color;
+    LineColor: Color;
+    NodeColor: Color;
+}
 
 let getRenderMode (mode: string) =
     match mode with
     | "Plain" -> Plain
     | "Alternative" -> Alternative
     | _ -> failwith "Invalid render mode"
+
+let getColor (color: string) =
+    match color with
+    | "Black" -> Color.Black
+    | "White" -> Color.White
+    | "Red" -> Color.Red
+    | "Green" -> Color.Green
+    | "Blue" -> Color.Blue
+    | "Yellow" -> Color.Yellow
+    | "Magenta" -> Color.Magenta
+    | "Cyan" -> Color.Cyan
+    | "Orange" -> Color.Orange
+    | "Pink" -> Color.Pink
+    | "Purple" -> Color.Purple
+    | "Brown" -> Color.Brown
+    | "Grey" -> Color.Grey
+    | "Violet" -> Color.Violet
+    | "BlueDark" -> Color.BlueDark
+    | "BlueLight" -> Color.BlueLight
+    | "CyanDark" -> Color.CyanDark
+    | "CyanLight" -> Color.CyanLight
+    | "GreyDark" -> Color.GreyDark
+    | "GreyLight" -> Color.GreyLight
+    | "GreenDark" -> Color.GreenDark
+    | "GreenLight" -> Color.GreenLight
+    | "OrangeDark" -> Color.OrangeDark
+    | "RedDark" -> Color.RedDark
+    | _ -> failwith "Invalid color"
 
 let getConfig () =
     {
@@ -32,4 +63,7 @@ let getConfig () =
         Margin = Settings().Renderer.Margin;
         Width = Settings().Renderer.Width;
         Height = Settings().Renderer.Height;
+        BackgroundColor = getColor <| Settings().Renderer.Colors.Background;
+        LineColor = getColor <| Settings().Renderer.Colors.Line;
+        NodeColor = getColor <| Settings().Renderer.Colors.Node;
     }
