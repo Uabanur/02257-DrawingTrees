@@ -1,0 +1,33 @@
+Group 5:
+	Roar Nind Steffensen - s144107
+	Samy Haffoudhi - s222887
+	Valeriu Seremet - s230096
+
+
+Date: 09/06/2023
+
+
+Program contributions:
+	Initial project setup - Roar
+	TreeDesigner - Roar, but Samy added configuration parameters
+	TreeDesignerChecks::nodesAtSameLevelShouldBeAtleastAGivenDistanceApart - Roar (prop1)
+	TreeDesignerChecks::parentIsCenteredOverOffsprings - Samy (prop2)
+	TreeDesignerChecks::treeHasReflectionalSymmetry - Roar (prop3)
+	TreeDesignerChecks::identicalSubtreesAreRenderedIdentically - Valeriu (prop4)
+	TreeDesignerChecks - Roar for the remaining implementations
+	TreeRenderer - Roar, but Samy added configuration parameters
+	Renderer - Roar
+	TreeExamples - Roar
+	Program - Modified by all throughout project
+	
+Report contributions:
+	  Abstract - Samy
+	1 Design of aesthetic pleasant renderings - Roar
+	2 Property-based testing - Roar (intro)
+	2.1 Property 1: Two nodes at the same level... - Roar
+	2.2 Property 2: A parent should be centred... - Samy
+	2.3 Property 3: Tree drawings should be symmetrical... - Roar
+	2.4 Property 4: Identical subtrees... - Valeriu
+	3 Visualization of trees - Roar (intro)
+	3.1 Rendering configurations - Roar and Samy
+	

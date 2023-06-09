@@ -82,6 +82,9 @@ let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
     let rec mirrorTree (Node(v,c)) =
         Node(v, c |> List.map mirrorTree |> List.rev)
 
+    let rec treeDegree (Node(_,c)) =
+        max (List.length c) (List.map treeDegree c |> List.fold max 0)
+
     let positionedOriginalTree = design {fst (getConfig()) with HorizontalSpacing = spacing} tree
     let positionedMirroredTree = design {fst (getConfig()) with HorizontalSpacing = spacing} (mirrorTree tree)
 
@@ -94,7 +97,10 @@ let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
         let mirroredPairs = List.zip originalChildren (List.rev mirroredChildren)
         areMirrored (nodeOriginal, nodeMirrored) && List.forall areMirrored mirroredPairs
 
+    let degree = treeDegree tree
     in hasReflectionalSymmetry positionedOriginalTree positionedMirroredTree
+        |> Prop.classify (degree <= 1) "Trivial"
+        |> Prop.classify (degree > 1) "Branching tree"
 
 type CustomGenerators =
     static member float() =
@@ -119,7 +125,6 @@ type CustomGenerators =
 
 // Property 4
 let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit>) (subTree: Tree<unit>) =
-
     let rec getRandomPath tree =
         let r = System.Random()
         match tree with
@@ -152,7 +157,11 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
         List.zip l1 l2 |> List.forall equalPositions
 
     let designedIsomorphicSubTree = findNodeByPath path designedCompositeTree
+
     identicalDesign designedIsomorphicSubTree designedSubTree
+        |> Prop.classify (path.Length = 0) "Trivial test"
+        |> Prop.classify (path.Length > 0) "Nested subtree comparison"
+
 
 let runAll () =
     printfn $"Running checks in {moduleName}..."
@@ -171,4 +180,3 @@ let runAll () =
     checkQuick "Property 2 check: " parentIsCenteredOverOffsprings
     checkQuick "Property 3 check: " treeHasReflectionalSymmetry
     checkQuick "Property 4 check: " identicalSubtreesAreRenderedIdentically
-
