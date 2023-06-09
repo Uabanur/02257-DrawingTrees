@@ -5,7 +5,7 @@ open FSharp.Configuration
 type Settings = YamlConfig<"Config.yml">
 type DesignConfig = { HorizontalSpacing: float; }
 type RenderMode =  | Plain | Alternative
-type RenderConfig = { Mode: RenderMode; VerticalSpacing: float; }
+type RenderConfig = { Mode: RenderMode; VerticalSpacing: float; MaxLinesLabel: int; }
 
 let getRenderMode (mode: string) =
     match mode with
@@ -19,5 +19,6 @@ let getConfig () =
     },
     {
         Mode = getRenderMode <| Settings().Renderer.Mode;
-        VerticalSpacing = Settings().Designer.VerticalSpacing
+        VerticalSpacing = Settings().Renderer.VerticalSpacing;
+        MaxLinesLabel = Settings().Renderer.MaxLinesLabel;
     }

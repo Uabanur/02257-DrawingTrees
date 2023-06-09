@@ -1,5 +1,6 @@
 Designer:
-  HorizontalSpacing: 1.0
-  VerticalSpacing: 2.0
+  HorizontalSpacing: 1.0 # Minimum spacing between nodes on a same level
 Renderer:
-  Mode: Plain
+  Mode: Plain # Drqwing mode (Plain / Alternative)
+  VerticalSpacing: 1.0 # Vertical spacing between nodes
+  MaxLinesLabel: 2 # Maximum number of lines for labels

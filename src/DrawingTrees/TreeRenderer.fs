@@ -7,9 +7,8 @@ open Config
 let getPositions trees =
     List.map (fun (Node((_,p),_)) -> p) trees
 
-let parseLabel lbl =
-    // todo: choose amount of lines based on config
-    let maxLines = 2
+let parseLabel config lbl =
+    let maxLines = config.MaxLinesLabel
     let maxLineLength = 10
 
     let takeMax limit list =
@@ -28,7 +27,7 @@ let getRendering config tree =
         let lineColor = Color.Black // todo get from config
 
         let nodeX = position + xOffset
-        let nodePoint = point (nodeX, level) (parseLabel label) pointColor
+        let nodePoint = point (nodeX, level) (parseLabel config label) pointColor
         let subTreePositions = List.map (fun (Node((_,p),_)) -> p + nodeX) subtrees
         if config.Mode = Alternative then
             let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level- config.VerticalSpacing) lineColor) subTreePositions
