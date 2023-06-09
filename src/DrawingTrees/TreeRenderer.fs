@@ -1,35 +1,63 @@
 module TreeRenderer
 
 open TreeDesigner
-open Plotly.NET
-open Plotly.NET.LayoutObjects // this namespace contains all object abstractions for layout styling
-
-// TODO Add white background to the labels
+open Renderer
 
 let getPositions trees =
     List.map (fun (Node((_,p),_)) -> p) trees
 
-let point xy label =
-    Chart.Point(xy=[xy], MultiText=[label], MultiTextPosition=[StyleParam.TextPosition.TopCenter], ShowLegend = false);
+let parseLabel lbl = 
+    // todo: choose amount of lines based on config
+    let maxLines = 2
+    let maxLineLength = 10
 
-let line (x1,y1) (x2,y2) =
-    Chart.Line([x1;x2], [y1;y2], LineColor = Color.fromString "black", ShowLegend = false);
+    let takeMax limit list =
+        List.take (min limit (List.length list)) list
 
-let getChart tree =
+    string lbl 
+        |> StringF.replace "\n" "<br>" 
+        |> StringF.split "<br>" 
+        |> List.filter StringF.notWhitespace
+        |> takeMax maxLines 
+        |> List.map (StringF.truncate maxLineLength) 
+
+let getRendering tree =
     let rec helper level (xOffset:Position) (Node((label, position), subtrees)) =
+        let pointColor = Color.Black // todo get from config
+        let lineColor = Color.Black // todo get from config
+
         let nodeX = position + xOffset
-        let nodePoint = point (nodeX, level) label
+        let nodePoint = point (nodeX, level) (parseLabel label) pointColor
         let subTreePositions = List.map (fun (Node((_,p),_)) -> p + nodeX) subtrees
-        let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level-1)) subTreePositions
-        let nodeChart = nodePoint :: subTreeConnections |> Chart.combine
+        let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level-1) lineColor) subTreePositions
+        let nodeChart = nodePoint :: subTreeConnections |> combineRenderings
         let subCharts = List.map (helper (level-1) nodeX) subtrees
-        nodeChart :: subCharts |> Chart.combine
+        nodeChart :: subCharts |> combineRenderings
     in helper 0 0.0 tree
 
-let render (tree:Tree<'a * Position>) =
-    let plainAxis = LinearAxis.init(ShowLine = false, Mirror = StyleParam.Mirror.False, ShowGrid = false)
+let getBounds (tree:Tree<'a*Position>) = 
+    let verticalSpacing = 1.0 // todo: get from config
+    let rec maxBounds ypos (Node((_, p),c)) = 
+        let childBounds = List.map (maxBounds (ypos-verticalSpacing)) c
+        let (xBounds, yBounds) = List.unzip childBounds
 
-    getChart tree
-    |> Chart.withXAxis plainAxis
-    |> Chart.withYAxis plainAxis
-    |> Chart.show
+        // adding x pos to child positions to translate relative positions
+        let xmin' = List.map fst xBounds |> List.map ((+)p) |> List.fold min p
+        let xmax' = List.map snd xBounds |> List.map ((+)p) |> List.fold max p
+        let ymin' = List.map fst yBounds |> List.fold min ypos
+        let ymax' = List.map snd yBounds |> List.fold max ypos
+        (xmin', xmax'), (ymin', ymax')
+    in maxBounds 0 tree
+
+let render (tree:Tree<'a * Position>) =
+    let margin = 20.0 // percent, todo: get from config
+
+    let marginScale = margin / 100.0
+    let ((xmin,xmax),(ymin,ymax)) = getBounds tree
+    let xRange = xmax - xmin
+    let yRange = ymax - ymin
+    let yMinMax = (ymin - yRange * marginScale, ymax + yRange * marginScale)
+    let xMinMax = (xmin - xRange * marginScale, xmax + xRange * marginScale)
+
+    printfn $"bounds: {(xmin,xmax)} {(ymin,ymax)}. yminmax: {yMinMax}. xminmax: {xMinMax}"
+    getRendering tree |> plot (xMinMax, yMinMax)

@@ -57,14 +57,14 @@ let runRenderingBenchmarks () =
 
   let treeGen h = TreeExamples.binaryTree h
 
-  seq {1..iterations} |> Seq.iter (fun _ -> treeGen 2 |> design 1.0 |> getChart |> ignore)
+  seq {1..iterations} |> Seq.iter (fun _ -> treeGen 2 |> design 1.0 |> getRendering |> ignore)
 
   seq {1..15} 
     |> Seq.iter 
       (fun height -> 
         let tree = treeGen height |> design 1.0
         let start = Stopwatch.GetTimestamp()
-        seq {1..iterations} |> Seq.iter (fun _ -> let chart = getChart tree in ())
+        seq {1..iterations} |> Seq.iter (fun _ -> let chart = getRendering tree in ())
         let elapsedNs = (Stopwatch.GetElapsedTime start).TotalNanoseconds / (float iterations)
         // printfn $"Binary tree height: {height}. Design avg time: {elapsedNs} ns"
         printfn $"{height}|{elapsedNs}"
@@ -72,3 +72,7 @@ let runRenderingBenchmarks () =
 
 
 runTests()
+
+TreeExamples.binaryTree 4
+  |> design 1.0 
+  |> render
