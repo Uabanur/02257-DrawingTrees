@@ -2,42 +2,54 @@ module TreeRenderer
 
 open TreeDesigner
 open Renderer
+open Config
 
 let getPositions trees =
     List.map (fun (Node((_,p),_)) -> p) trees
 
-let parseLabel lbl = 
-    // todo: choose amount of lines based on config
-    let maxLines = 2
+let parseLabel config lbl =
+    let maxLines = config.MaxLinesLabel
     let maxLineLength = 10
 
     let takeMax limit list =
         List.take (min limit (List.length list)) list
 
-    string lbl 
-        |> StringF.replace "\n" "<br>" 
-        |> StringF.split "<br>" 
+    string lbl
+        |> StringF.replace "\n" "<br>"
+        |> StringF.split "<br>"
         |> List.filter StringF.notWhitespace
-        |> takeMax maxLines 
-        |> List.map (StringF.truncate maxLineLength) 
+        |> takeMax maxLines
+        |> List.map (StringF.truncate maxLineLength)
 
-let getRendering tree =
+let getRendering config tree =
     let rec helper level (xOffset:Position) (Node((label, position), subtrees)) =
-        let pointColor = Color.Black // todo get from config
-        let lineColor = Color.Black // todo get from config
+        let pointColor = config.NodeColor
+        let lineColor = config.LineColor
 
         let nodeX = position + xOffset
-        let nodePoint = point (nodeX, level) (parseLabel label) pointColor
+        let nodePoint = point (nodeX, level) (parseLabel config label) pointColor
         let subTreePositions = List.map (fun (Node((_,p),_)) -> p + nodeX) subtrees
-        let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level-1) lineColor) subTreePositions
-        let nodeChart = nodePoint :: subTreeConnections |> combineRenderings
-        let subCharts = List.map (helper (level-1) nodeX) subtrees
-        nodeChart :: subCharts |> combineRenderings
-    in helper 0 0.0 tree
+        if config.Mode = Alternative then
+            let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level- config.VerticalSpacing) lineColor) subTreePositions
+            let nodeChart = nodePoint :: subTreeConnections |> combineRenderings
+            let subCharts = List.map (helper (level - config.VerticalSpacing) nodeX) subtrees
+            nodeChart :: subCharts |> combineRenderings
+        else
+            let subTreeHorizontalConnections =
+                if List.isEmpty subtrees then []
+                else [line (List.min subTreePositions, level - config.VerticalSpacing / 5.0) (List.max subTreePositions, level - config.VerticalSpacing / 5.0) lineColor]
+            let subTreeVerticalConnections = List.map (fun p -> line (p, level - config.VerticalSpacing / 5.0) (p, level - config.VerticalSpacing) lineColor) subTreePositions
+            let nodeSubTreeConnection =
+                if List.isEmpty subtrees then []
+                 else [line (nodeX, level) (nodeX, level - config.VerticalSpacing / 5.0) lineColor]
+            let nodeChart = subTreeHorizontalConnections @ nodeSubTreeConnection @ subTreeVerticalConnections @ [nodePoint] |> combineRenderings
+            let subCharts = List.map (helper (level - config.VerticalSpacing) nodeX) subtrees
+            nodeChart :: subCharts |> combineRenderings
+    helper 0 0.0 tree
 
-let getBounds (tree:Tree<'a*Position>) = 
-    let verticalSpacing = 1.0 // todo: get from config
-    let rec maxBounds ypos (Node((_, p),c)) = 
+let getBounds (config: RenderConfig) (tree:Tree<'a*Position>) =
+    let verticalSpacing = config.VerticalSpacing
+    let rec maxBounds ypos (Node((_, p),c)) =
         let childBounds = List.map (maxBounds (ypos-verticalSpacing)) c
         let (xBounds, yBounds) = List.unzip childBounds
 
@@ -49,15 +61,15 @@ let getBounds (tree:Tree<'a*Position>) =
         (xmin', xmax'), (ymin', ymax')
     in maxBounds 0 tree
 
-let render (tree:Tree<'a * Position>) =
-    let margin = 20.0 // percent, todo: get from config
+let render (config: RenderConfig) (tree:Tree<'a * Position>) =
+    let margin = config.Margin
 
     let marginScale = margin / 100.0
-    let ((xmin,xmax),(ymin,ymax)) = getBounds tree
+    let ((xmin,xmax),(ymin,ymax)) = getBounds config tree
     let xRange = xmax - xmin
     let yRange = ymax - ymin
     let yMinMax = (ymin - yRange * marginScale, ymax + yRange * marginScale)
     let xMinMax = (xmin - xRange * marginScale, xmax + xRange * marginScale)
 
     printfn $"bounds: {(xmin,xmax)} {(ymin,ymax)}. yminmax: {yMinMax}. xminmax: {xMinMax}"
-    getRendering tree |> plot (xMinMax, yMinMax)
+    getRendering config tree |> plot config (xMinMax, yMinMax)

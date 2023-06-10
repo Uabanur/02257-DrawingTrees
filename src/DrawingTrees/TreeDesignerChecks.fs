@@ -4,6 +4,7 @@ let internal moduleName = string typeof<Marker>.DeclaringType
 
 open FsCheck
 open TreeDesigner
+open Config
 
 type Distance = Dist of float
 
@@ -44,7 +45,7 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
     let childrenWithAbsolutePositionToParent (Node((_,p),c)) =
         List.map (fun (Node((l', p'), c')) -> Node((l', p+p'), c')) c
 
-    let maxLevelSize tree = 
+    let maxLevelSize tree =
         let rec maxLevelSize' level acc =
             let nextLevel = List.collect (fun (Node(_,c)) -> c) level
             let maxLevelSizeSoFar = max acc (List.length level)
@@ -61,32 +62,36 @@ let nodesAtSameLevelShouldBeAtleastAGivenDistanceApart (Dist(spacing)) (tree:Tre
 
         let nextLevel = List.collect childrenWithAbsolutePositionToParent levelNodes
         validDistance && (List.isEmpty nextLevel || nodeDistanceCheck nextLevel)
-    
+
     let hasMultiNodeLevel = maxLevelSize tree > 1
-    nodeDistanceCheck <| design spacing tree :: []
+    nodeDistanceCheck <| design {fst (getConfig()) with HorizontalSpacing = spacing} tree :: []
         |> Prop.classify (not hasMultiNodeLevel) "Trivial test"
         |> Prop.classify hasMultiNodeLevel "Contains multi node levels"
 
 // Property 2
 let parentIsCenteredOverOffsprings (Dist(spacing)) (tree: Tree<unit>) =
-    let designedTree = design spacing tree
+    let designedTree = design {fst (getConfig()) with HorizontalSpacing = spacing} tree
     let rec checkPositions (Node(_, children)) =
         let positions = List.map (fun (Node((_, p), _)) -> p) children
         let sum = if List.isEmpty positions then 0.0 else List.min positions + List.max positions
         floatsEquals sum 0.0 && List.forall checkPositions children
+
+    let isTrivial (Node(_, children)) = List.isEmpty children
+
     checkPositions designedTree
+    |> Prop.classify (isTrivial designedTree) "Trivial test"
+    |> Prop.classify (not (isTrivial designedTree)) "Contains at least one parent node"
 
 // Property 3
 let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
     let rec mirrorTree (Node(v,c)) =
         Node(v, c |> List.map mirrorTree |> List.rev)
 
-    let rec treeDegree (Node(_,c)) = 
+    let rec treeDegree (Node(_,c)) =
         max (List.length c) (List.map treeDegree c |> List.fold max 0)
 
-
-    let positionedOriginalTree = design spacing tree
-    let positionedMirroredTree = design spacing (mirrorTree tree)
+    let positionedOriginalTree = design {fst (getConfig()) with HorizontalSpacing = spacing} tree
+    let positionedMirroredTree = design {fst (getConfig()) with HorizontalSpacing = spacing} (mirrorTree tree)
 
     let areMirrored (Node((_,pOriginal),_), Node((_,pMirrored),_)) =
         floatsEquals pOriginal -pMirrored
@@ -102,26 +107,26 @@ let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
         |> Prop.classify (degree <= 1) "Trivial"
         |> Prop.classify (degree > 1) "Branching tree"
 
-type CustomGenerators = 
-    static member float() = 
-        { 
+type CustomGenerators =
+    static member float() =
+        {
             new Arbitrary<float>() with
             override x.Generator = Arb.generate<NormalFloat>
                                     |> Gen.map NormalFloat.op_Explicit
         }
-    static member distance() = 
+    static member distance() =
         {
-            new Arbitrary<Distance>() with 
+            new Arbitrary<Distance>() with
             override x.Generator = Arb.generate<NormalFloat>
                                     |> Gen.map NormalFloat.op_Explicit
                                     |> Gen.where ((<=) 0.0)
                                     |> Gen.map Dist
-            override x.Shrinker f = match f with 
+            override x.Shrinker f = match f with
                                     | Dist(x) when x = 0.0 -> seq [] // stop
                                     | Dist(x) when x <= 0.1 -> seq [Dist(0.0)] // try 0.0 when limit is reached
                                     | Dist(x) -> seq [Dist(x/2.0)] // half if above limit
         }
-        
+
 
 // Property 4
 let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit>) (subTree: Tree<unit>) =
@@ -132,32 +137,32 @@ let identicalSubtreesAreRenderedIdentically (Dist(spacing)) (mainTree: Tree<unit
         | Node (_, l) ->
             let randomNode = r.Next l.Length
             randomNode :: getRandomPath l.[randomNode]
-        
+
     let rec insertAtPath subTree mainTree path =
         match mainTree, path with
         | _, [] -> subTree
         | Node(v, l), h::t -> Node(v, l |> List.mapi (fun i c -> if h=i then insertAtPath subTree c t else c))
-    
+
     let insert subTree mainTree =
         let path = getRandomPath mainTree
         (insertAtPath subTree mainTree path, path)
-        
+
     let (compositeTree, path) = insert subTree mainTree
-    let designedCompositeTree = design spacing compositeTree
-    let designedSubTree = design spacing subTree
-    
+    let designedCompositeTree = design {fst (getConfig()) with HorizontalSpacing = spacing} compositeTree
+    let designedSubTree = design {fst (getConfig()) with HorizontalSpacing = spacing} subTree
+
     let rec findNodeByPath path tree =
         match tree, path with
         | node, [] -> node
         | Node (_, l), h::t -> findNodeByPath t l.[h]
-    
+
     let identicalDesign (Node(_, l1)) (Node(_, l2)) =
-        let rec equalPositions (Node((_,p1), l1), Node((_,p2), l2)) = 
+        let rec equalPositions (Node((_,p1), l1), Node((_,p2), l2)) =
             floatsEquals p1 p2 && (List.zip l1 l2 |> List.forall equalPositions)
         List.zip l1 l2 |> List.forall equalPositions
-        
+
     let designedIsomorphicSubTree = findNodeByPath path designedCompositeTree
-    
+
     identicalDesign designedIsomorphicSubTree designedSubTree
         |> Prop.classify (path.Length = 0) "Trivial test"
         |> Prop.classify (path.Length > 0) "Nested subtree comparison"
@@ -180,4 +185,3 @@ let runAll () =
     checkQuick "Property 2 check: " parentIsCenteredOverOffsprings
     checkQuick "Property 3 check: " treeHasReflectionalSymmetry
     checkQuick "Property 4 check: " identicalSubtreesAreRenderedIdentically
-
