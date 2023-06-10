@@ -75,7 +75,12 @@ let parentIsCenteredOverOffsprings (Dist(spacing)) (tree: Tree<unit>) =
         let positions = List.map (fun (Node((_, p), _)) -> p) children
         let sum = if List.isEmpty positions then 0.0 else List.min positions + List.max positions
         floatsEquals sum 0.0 && List.forall checkPositions children
+
+    let isTrivial (Node(_, children)) = List.isEmpty children
+
     checkPositions designedTree
+    |> Prop.classify (isTrivial designedTree) "Trivial test"
+    |> Prop.classify (not (isTrivial designedTree)) "Contains at least one parent node"
 
 // Property 3
 let treeHasReflectionalSymmetry (Dist(spacing)) (tree:Tree<unit>) =
