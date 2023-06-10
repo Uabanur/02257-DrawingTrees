@@ -23,15 +23,14 @@ let parseLabel config lbl =
 
 let getRendering config tree =
     let rec helper level (xOffset:Position) (Node((label, position), subtrees)) =
-        let pointColor = config.NodeColor
         let lineColor = config.LineColor
 
         let nodeX = position + xOffset
-        let nodePoint = point (nodeX, level) (parseLabel config label) pointColor
+        let nodePoint = point config (nodeX, level) (parseLabel config label)
         let subTreePositions = List.map (fun (Node((_,p),_)) -> p + nodeX) subtrees
         if config.Mode = Alternative then
             let subTreeConnections = List.map (fun p -> line (nodeX, level) (p, level- config.VerticalSpacing) lineColor) subTreePositions
-            let nodeChart = nodePoint :: subTreeConnections |> combineRenderings
+            let nodeChart = subTreeConnections @ [nodePoint] |> combineRenderings
             let subCharts = List.map (helper (level - config.VerticalSpacing) nodeX) subtrees
             nodeChart :: subCharts |> combineRenderings
         else
