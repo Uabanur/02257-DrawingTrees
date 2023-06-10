@@ -8,5 +8,5 @@ Renderer:
   Width: 800 # Drawing window width
   Height: 800 # Drawing window height
   Colors: # colors are defined in the Color.fs file
-    Background: "CyanLight"
+    Background: "White"
     Line: "Black"
