@@ -1,19 +1,24 @@
 module Renderer
 
 open Plotly.NET
-open Plotly.NET.LayoutObjects // this namespace contains all object abstractions for layout styling
+open Plotly.NET.LayoutObjects
+open Plotly.NET.TraceObjects
 open Config
 open Color
 
 type Rendering = R of GenericChart.GenericChart
 
-let point xy label color =
-    Chart.Point([xy],
+let point config xy label =
+    Chart.Point(
+        xy=[xy],
         Text= StringF.join "<br>" label,
-        TextPosition=StyleParam.TextPosition.TopCenter,
+        TextPosition=StyleParam.TextPosition.Inside,
         ShowLegend = false,
-        MarkerColor = mapColor color
-    ) |> R;
+        Marker = Marker.init(
+            Color = mapColor (config.BackgroundColor),
+            Size = 20 * config.MaxLinesLabel
+        )
+    ) |> R
 
 let line (x1,y1) (x2,y2) color =
     Chart.Line([x1;x2], [y1;y2],
