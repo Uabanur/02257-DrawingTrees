@@ -34,7 +34,6 @@ let configExamples () =
     |> render { rendererConfig with Title = "Example 1: Default config" }
 
     // example 2
-    let designerConfig, rendererConfig = getConfig()
     let tree = Node(
         "line 1\nline 2",
         [
