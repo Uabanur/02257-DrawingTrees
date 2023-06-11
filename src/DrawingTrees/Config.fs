@@ -5,7 +5,7 @@ open Color
 
 type Settings = YamlConfig<"Config.yml">
 type DesignConfig = { HorizontalSpacing: float; }
-type RenderMode =  | Plain | Alternative
+type RenderMode =  | Angled | Direct
 type RenderConfig = {
     Mode: RenderMode;
     VerticalSpacing: float;
@@ -19,8 +19,8 @@ type RenderConfig = {
 
 let getRenderMode (mode: string) =
     match mode with
-    | "Plain" -> Plain
-    | "Alternative" -> Alternative
+    | "Angled" -> Angled
+    | "Direct" -> Direct
     | _ -> failwith "Invalid render mode"
 
 let getColor (color: string) =
