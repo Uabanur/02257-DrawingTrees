@@ -1,3 +1,6 @@
+// Date: 11/06/2023
+// Contributor(s): Roar, Samy
+
 module TreeExamples
 open System
 open Config

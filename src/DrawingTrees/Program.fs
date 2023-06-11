@@ -1,4 +1,7 @@
-﻿open TreeDesigner
+﻿// Date: 11/06/2023
+// Contributor(s): Roar, Valeriu, Samy
+
+open TreeDesigner
 open TreeRenderer
 open System.Diagnostics
 open Config
