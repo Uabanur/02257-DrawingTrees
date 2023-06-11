@@ -1,3 +1,6 @@
+// Date: 11/06/2023
+// Contributor(s): Samy
+
 module Config
 
 open FSharp.Configuration

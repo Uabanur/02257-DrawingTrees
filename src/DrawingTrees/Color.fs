@@ -1,3 +1,6 @@
+// Date: 11/06/2023
+// Contributor(s): Roar
+
 module Color
 
 open Plotly.NET
