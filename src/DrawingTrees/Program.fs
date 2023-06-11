@@ -52,6 +52,4 @@ let runRenderingBenchmarks () =
 
 runTests()
 
-TreeExamples.binaryTree 4
-  |> design designConfig
-  |> render renderConfig
+TreeExamples.configExamples()

@@ -47,4 +47,5 @@ let plot config (xMinMax, yMinMax) (R(chart)) =
       |> Chart.withXAxis (plainAxis xMinMax)
       |> Chart.withYAxis (plainAxis yMinMax)
       |> Chart.withLayoutStyle(PlotBGColor=mapColor background, Width = fst dimensions, Height = snd dimensions)
+      |> Chart.withTitle(config.Title)
       |> Chart.show

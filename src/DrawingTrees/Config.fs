@@ -15,6 +15,7 @@ type RenderConfig = {
     Height: int;
     BackgroundColor: Color;
     LineColor: Color;
+    Title: string;
 }
 
 let getRenderMode (mode: string) =
@@ -64,4 +65,5 @@ let getConfig () =
         Height = Settings().Renderer.Height;
         BackgroundColor = getColor <| Settings().Renderer.Colors.Background;
         LineColor = getColor <| Settings().Renderer.Colors.Line;
+        Title = "";
     }
