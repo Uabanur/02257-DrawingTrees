@@ -4,7 +4,7 @@ Group 5:
 	Valeriu Seremet - s230096
 
 
-Date: 09/06/2023
+Date: 11/06/2023
 
 
 Program contributions:
@@ -15,11 +15,12 @@ Program contributions:
 	TreeDesignerChecks::treeHasReflectionalSymmetry - Roar (prop3)
 	TreeDesignerChecks::identicalSubtreesAreRenderedIdentically - Valeriu (prop4)
 	TreeDesignerChecks - Roar for the remaining implementations
-	TreeRenderer - Roar, but Samy added configuration parameters
-	Renderer - Roar
-	TreeExamples - Roar
+	StringF - Roar
+	TreeRenderer - Roar, Samy
+	Renderer - Roar, Samy
+	TreeExamples - Roar, Samy
 	Program - Modified by all throughout project
-	
+
 Report contributions:
 	  Abstract - Samy
 	1 Design of aesthetic pleasant renderings - Roar
@@ -30,4 +31,4 @@ Report contributions:
 	2.4 Property 4: Identical subtrees... - Valeriu
 	3 Visualization of trees - Roar (intro)
 	3.1 Rendering configurations - Roar and Samy
-	
+	4 Evaluation - Valeriu and Samy
