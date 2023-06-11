@@ -1,3 +1,6 @@
+// Date: 11/06/2023
+// Contributor(s): Roar, Valeriu, Samy
+
 module TreeDesignerChecks
 type internal Marker = interface end
 let internal moduleName = string typeof<Marker>.DeclaringType

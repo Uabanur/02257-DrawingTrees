@@ -1,3 +1,6 @@
+// Date: 11/06/2023
+// Contributor(s): Roar, Samy
+
 module Renderer
 
 open Plotly.NET
@@ -47,4 +50,5 @@ let plot config (xMinMax, yMinMax) (R(chart)) =
       |> Chart.withXAxis (plainAxis xMinMax)
       |> Chart.withYAxis (plainAxis yMinMax)
       |> Chart.withLayoutStyle(PlotBGColor=mapColor background, Width = fst dimensions, Height = snd dimensions)
+      |> Chart.withTitle(config.Title)
       |> Chart.show

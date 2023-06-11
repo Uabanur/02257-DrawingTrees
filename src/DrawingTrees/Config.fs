@@ -1,3 +1,6 @@
+// Date: 11/06/2023
+// Contributor(s): Samy
+
 module Config
 
 open FSharp.Configuration
@@ -15,6 +18,7 @@ type RenderConfig = {
     Height: int;
     BackgroundColor: Color;
     LineColor: Color;
+    Title: string;
 }
 
 let getRenderMode (mode: string) =
@@ -64,4 +68,5 @@ let getConfig () =
         Height = Settings().Renderer.Height;
         BackgroundColor = getColor <| Settings().Renderer.Colors.Background;
         LineColor = getColor <| Settings().Renderer.Colors.Line;
+        Title = "";
     }
